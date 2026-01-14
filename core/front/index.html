@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecology Model</title>
+    
+    <link rel="stylesheet" href="./CSS/style.css"/>
+    <link rel="stylesheet" href="./CSS/tabs.css"/>
+    
+    <link rel="stylesheet" href="./CSS/bootstrap.min.css"/>
+
+    <script src="./JS/tabs.js" async></script>
+    <script src="./JS/bootstrap.min.js" async></script>
+    <script src="./JS/bootstrap.js" async></script>
+
+    <style>
+
+    body {
+        background-color: gray;
+    }
+
+    </style>
+</head>
+<body>
+
+    <div class="page-container">
+
+        <div class="page-header">
+
+            <h2>Hello, World 2!</h2>
+            
+            <div class="subtitle">This is my first paragraph on my first HTML page.</div>
+        </div>
+
+        <div class="main-content">
+            <div class="results-area">
+                <div class="results-card p-3 m-3">
+                    
+                    <!--nav tabs-->
+                    <div class="nav-tabs" id="navTabs">
+                        <input type="radio" class="btn-check" name="options-base" id="presets" autocomplete="off" checked>
+                        <label class="btn" for="presets">Готовые параметры</label>
+                        
+                        <input type="radio" class="btn-check" name="options-base" id="customParams" autocomplete="off">
+                        <label class="btn" for="customParams">Ввести свои параметры</label>
+                    </div>
+
+                    <form id="form"> 
+                        
+                        <!--grid of presets-->
+                        <div class="option" id="presets" checked>
+
+                            <h3>Presets</h3>
+
+                            <div class="row g-3 row-cols-1 row-cols-md-2 row-cols-lg-3">
+                            
+                                <div class="col form-field">
+
+                                    <div class="card" style="width: 18rem;">
+                                        <img src="./Assets/Images/Volgograd.png" class="card-img-top" alt="Волгоград">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                Параметры очистки сточных вод славного города-героя Волгоград
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col form-field">
+
+                                    <div class="card" style="width: 18rem;">
+                                        <img src="./Assets/Images/Volzhsky.jpg" class="card-img-top" alt="Волжский">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                Параметры очистки сточных вод города Волжский
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col form-field">
+
+                                    <div class="card" style="width: 18rem;">
+                                        <img src="./Assets/Images/Volzhsky.jpg" class="card-img-top" alt="Волжский">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                Параметры очистки сточных вод города Волжский
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <!--form for custom parameters-->
+                        <div class="option" id="customParams">
+
+                            <h3>Custom params</h3>
+
+                            <div class="row g-3 row-cols-1 row-cols-md-2 row-cols-lg-3">
+                            
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                                    <label for="floatingInput">Email address</label>
+                                </div>
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                                    <label for="floatingPassword">Password</label>
+                                </div>
+        
+                                <div class="col form-field form-floating mb-3">
+                                    <input id="test_input_1" placeholder="test input 1" class="form-control"/>
+                                    <label for="test_input_1">Label</label>
+                                </div>
+                                
+                                <div class="col form-field form-floating mb-3">
+                                    <input id="test_input_2" placeholder="test input 2" class="form-control"/>
+                                    <label for="test_input_2">Label</label>
+                                </div>
+        
+                                <div class="col form-field form-floating mb-3">
+                                    <input id="test_input_3" placeholder="test input 2" class="form-control"/>
+                                    <label for="test_input_3">Label</label>
+                                </div>
+        
+                                <div class="col form-field form-floating mb-3">
+                                    <input id="test_input_4" placeholder="test input 2" class="form-control"/>
+                                    <label for="test_input_4">Label</label>
+                                </div>
+        
+                                <div class="col form-field form-floating mb-3">
+                                    <input id="test_input_5" placeholder="test input 2" class="form-control"/>
+                                    <label for="test_input_5">Label</label>
+                                </div>
+        
+                                <div class="col form-field form-floating mb-3">
+                                    <input id="test_input_6" placeholder="test input 2" class="form-control"/>
+                                    <label for="test_input_6">Label</label>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end pt-1 mt-1">
+                            <button class="p-1 m-1" >Submit</button>
+                            <button class="p-1 m-1">Clear</button>
+                        </div>
+                    </form>
+                </div>              
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

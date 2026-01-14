@@ -1,0 +1,18 @@
+
+.nav-tabs {
+    padding: 3px;
+    margin: 3px;
+    background-color: white;
+}
+
+.option {
+    display: none;
+}
+
+
+.option[checked] {
+    display: block;
+}
+
+
+

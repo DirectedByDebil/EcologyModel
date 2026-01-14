@@ -1,0 +1,136 @@
+
+:root {
+    --text-light: lightgray;
+}
+
+.input-form {
+    display: grid;
+    background-color: aquamarine;
+    gap: 12px;
+}
+
+
+.nav-tabs {
+    background-color: aliceblue;
+}
+
+
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.page-header {
+    margin-bottom: 16px;
+}
+.page-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 400;
+}
+.page-header .subtitle {
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+.filters-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.filter-field {
+    min-width: 200px;
+}
+
+
+.form-field {
+
+    display: grid;
+    padding: 3px;
+}
+
+
+
+.stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    min-width: 120px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.stat-card .value {
+    font-size: 28px;
+    font-weight: 500;
+}
+.stat-card .label {
+    color: var(--nuxeo-text-light);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+
+.results-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+
+.main-content {
+    display: flex;
+    gap: 24px;
+}
+
+.results-area {
+    flex: 1;
+}
+
+.results-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--nuxeo-border, #e0e0e0);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+
+.sla-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+.sla-badge.overdue { background: #fee2e2; color: #dc2626; }
+.sla-badge.warning { background: #fef3c7; color: #d97706; }
+.sla-badge.ontrack { background: #d1fae5; color: #059669; }
+
+.dialog-content {
+    padding: 16px;
+    min-width: 400px;
+}
+.dialog-buttons {
+    padding: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.search-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+}
+
+.search-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
