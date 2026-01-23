@@ -5,14 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecology Model</title>
     
-    <link rel="stylesheet" href="./CSS/style.css"/>
-    <link rel="stylesheet" href="./CSS/tabs.css"/>
+    <link rel="stylesheet" href="./static/CSS/style.css"/>
+    <link rel="stylesheet" href="./static/CSS/tabs.css"/>
+    <link rel="stylesheet" href="./static/CSS/cards.css"/>
     
-    <link rel="stylesheet" href="./CSS/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./static/CSS/bootstrap.min.css"/>
 
-    <script src="./JS/tabs.js" async></script>
-    <script src="./JS/bootstrap.min.js" async></script>
-    <script src="./JS/bootstrap.js" async></script>
+    <script src="./static/JS/tabs.js" async></script>
+    <script src="./static/JS/cards.js" async></script>
+    <script src="./static/JS/form.js" async></script>
+
+    <script src="./static/JS/bootstrap.min.js" async></script>
+    <script src="./static/JS/bootstrap.js" async></script>
 
     <style>
 
@@ -28,7 +32,7 @@
 
         <div class="page-header">
 
-            <h2>Hello, World 2!</h2>
+            <h2>Модель вод</h2>
             
             <div class="subtitle">This is my first paragraph on my first HTML page.</div>
         </div>
@@ -39,10 +43,10 @@
                     
                     <!--nav tabs-->
                     <div class="nav-tabs" id="navTabs">
-                        <input type="radio" class="btn-check" name="options-base" id="presets" autocomplete="off" checked>
+                        <input type="radio" class="btn-check" name="options-form-tabs" id="presets" autocomplete="off" checked>
                         <label class="btn" for="presets">Готовые параметры</label>
                         
-                        <input type="radio" class="btn-check" name="options-base" id="customParams" autocomplete="off">
+                        <input type="radio" class="btn-check" name="options-form-tabs" id="customParams" autocomplete="off">
                         <label class="btn" for="customParams">Ввести свои параметры</label>
                     </div>
 
@@ -57,8 +61,11 @@
                             
                                 <div class="col form-field">
 
-                                    <div class="card" style="width: 18rem;">
-                                        <img src="./Assets/Images/Volgograd.png" class="card-img-top" alt="Волгоград">
+                                    <div class="card"
+                                    name="options-presets"
+                                    id="volgograd"
+                                    style="width: 18rem;">
+                                        <img src="./static/Assets/Images/Volgograd.png" class="card-img-top" alt="Волгоград">
                                         <div class="card-body">
                                             <p class="card-text">
                                                 Параметры очистки сточных вод славного города-героя Волгоград
@@ -69,8 +76,11 @@
                                 
                                 <div class="col form-field">
 
-                                    <div class="card" style="width: 18rem;">
-                                        <img src="./Assets/Images/Volzhsky.jpg" class="card-img-top" alt="Волжский">
+                                    <div class="card"
+                                    name="options-presets"
+                                    id="volzhsky"
+                                    style="width: 18rem;">
+                                        <img src="./static/Assets/Images/Volzhsky.jpg" class="card-img-top" alt="Волжский">
                                         <div class="card-body">
                                             <p class="card-text">
                                                 Параметры очистки сточных вод города Волжский
@@ -81,8 +91,11 @@
                                 
                                 <div class="col form-field">
 
-                                    <div class="card" style="width: 18rem;">
-                                        <img src="./Assets/Images/Volzhsky.jpg" class="card-img-top" alt="Волжский">
+                                    <div class="card"
+                                    name="options-presets"
+                                    id="tomsk"
+                                    style="width: 18rem;">
+                                        <img src="./static/Assets/Images/Volzhsky.jpg" class="card-img-top" alt="Волжский">
                                         <div class="card-body">
                                             <p class="card-text">
                                                 Параметры очистки сточных вод города Волжский
@@ -145,8 +158,8 @@
                         </div>
                         
                         <div class="d-flex justify-content-end pt-1 mt-1">
-                            <button class="p-1 m-1" >Submit</button>
-                            <button class="p-1 m-1">Clear</button>
+                            <button class="p-1 m-1 btn" type="button" id="sendButton" >Построить график</button>
+                            <button class="p-1 m-1 btn" type="button" id="resetButton">Очистить</button>
                         </div>
                     </form>
                 </div>              

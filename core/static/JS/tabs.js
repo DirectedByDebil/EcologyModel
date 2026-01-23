@@ -31,3 +31,5 @@ radios.forEach(radioBtn => {
         tabs[groupName].current?.setAttribute('checked', true);
     });
 });
+
+window.tabs = tabs;

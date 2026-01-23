@@ -1,0 +1,13 @@
+
+.card{
+    transition-property: scale;
+    transition-duration: 200ms;
+}
+
+.card:hover {
+    scale: 1.05;
+}
+
+.card[checked] {
+    background-color: lightblue;
+}
