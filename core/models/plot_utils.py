@@ -26,6 +26,10 @@ class PlotSettings:
         self.cols = cols
 
 
+plt.rcParams.update({'font.size': 40})
+plt.rcParams['font.family'] = 'serif'
+
+
 def get_color(i: int = 0):
 
     colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
@@ -42,7 +46,7 @@ def create_figure(suptitle):
 
     plt.figure(figsize=(16, 12))
     
-    plt.suptitle(suptitle, fontsize=14, fontweight='bold')
+    #plt.suptitle(suptitle, fontsize=14, fontweight='bold')
     
 
 def save_figure(file_name):
@@ -50,7 +54,7 @@ def save_figure(file_name):
     plt.tight_layout()
 
     plt.savefig(f'{file_name}.png', dpi=300, bbox_inches='tight')
-    plt.savefig(f'{file_name}.pdf', bbox_inches='tight')
+    #plt.savefig(f'{file_name}.pdf', bbox_inches='tight')
 
     print("\n✅ Графики сохранены в файлы")
 

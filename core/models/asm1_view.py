@@ -316,7 +316,7 @@ def plot_results_v2(sol, params, clarifier_results):
     output_dir = "results"
     os.makedirs(output_dir, exist_ok=True)
 
-    settings = PlotSettings(2, 2)
+    settings = PlotSettings(1, 1)
     settings.fileName = f'{output_dir}/treatment'
 
     suptitle = f'МАТЕМАТИЧЕСКАЯ МОДЕЛЬ ОЧИСТКИ СТОЧНЫХ ВОД\n HRT = {params["HRT"]:.1f} сут, SRT = {params["SRT"]:.0f} сут'
@@ -334,7 +334,7 @@ def plot_results_v2(sol, params, clarifier_results):
     settings.labels = ['После аэротенка', f"После отстойника ({bod_final[-1]:.1f} мг/л)", 'Норматив (20 мг/л)']   
 
     settings.yLabel = 'Концентрация, мг/л'
-    settings.title = 'Динамика БПК'
+    settings.title = 'а) Динамика БПК'
 
     create_plot(settings)
 
@@ -347,7 +347,7 @@ def plot_results_v2(sol, params, clarifier_results):
     settings.labels = ['Биомасса (X)', 'Оптимум (2500 мг/л)']
     
     settings.yLabel = 'Концентрация, мг/л'
-    settings.title = 'Динамика активной биомассы'
+    settings.title = 'а) Динамика активной биомассы'
 
 
     create_plot(settings)
@@ -361,12 +361,13 @@ def plot_results_v2(sol, params, clarifier_results):
     S_in = params['S_bio_in'] + params['S_inert_in'] 
     
     F_M = (Q * S_in) / (V * X)
+    F_M = clarifier_results['F_M']
 
     settings.y = [F_M]
-    settings.labels = ['F_M']
+    settings.labels = ['F/M']
 
-    settings.yLabel = 'мг/л, наверное'
-    settings.title = 'Нагрузка на ил (F/M)'
+    settings.yLabel = r'кг/(кг·сут)'
+    settings.title = 'г) Нагрузка на ил (F/M)'
 
     create_plot(settings)
 
@@ -381,7 +382,7 @@ def plot_results_v2(sol, params, clarifier_results):
     settings.y = [mu]
     settings.labels = ['mu']
 
-    settings.yLabel = 'мг/л, наверное'
+    settings.yLabel = 'мг/л'
     settings.title = 'Скорость роста бактерий'
     
     create_plot(settings)
@@ -396,7 +397,7 @@ def plot_results_v2(sol, params, clarifier_results):
     settings.labels = ['Кислород (O)', 'Минимум (2 мг/л)']
 
     settings.yLabel = 'Концентрация, мг/л'
-    settings.title = 'Динамика растворённого кислорода'
+    settings.title = 'б) Динамика растворённого кислорода'
 
     create_plot(settings)
 
@@ -412,7 +413,7 @@ def plot_results_v2(sol, params, clarifier_results):
     settings.labels = ['Аэротенк', 'Полная система', 'Цель (90%)']
 
     settings.yLabel = 'Эффективность, %'
-    settings.title = 'Эффективность очистки'
+    settings.title = 'в) Эффективность очистки'
 
     create_plot(settings)
     
@@ -425,7 +426,7 @@ def plot_results_v2(sol, params, clarifier_results):
     settings.labels = ['Биоразлагаемая', 'Инертная', 'Инертная после отстойника']
 
     settings.yLabel = 'Концентрация, мг/л'
-    settings.title = 'Составляющие БПК'
+    settings.title = 'б) Составляющие БПК'
 
     create_plot(settings)
     
