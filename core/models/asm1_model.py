@@ -120,7 +120,6 @@ def aeration_tank_physical(params=None):
     
     return sol, params
 
-# Отстойник
 def secondary_clarifier_physical(sol, params):
     """
     Модель вторичного отстойника с учётом рециркуляции
@@ -162,5 +161,174 @@ def secondary_clarifier_physical(sol, params):
         'X_final': X_final,
         'removal': removal,
         'F_M': F_M
+    }
+
+
+def aeration_tank_physical_with_nitri(params=None):
+    """
+    Модель аэротенка с нитрификацией и денитрификацией
+    Переменные: [S_bio, X_BH, S_inert, X_BA, S_NH, S_NO, O]
+    """
+    
+    if params is None:
+        params = {
+            # Реактор
+            'V': 5000, 'Q': 1000, 'r': 0.57,
+            'X_r_max': 8000, 'eta': 0.3,
+            
+            # Гетеротрофы
+            'Y_H': 0.67, 'mu_max_H': 3.5/24, 'K_S': 120.0,
+            'K_OH': 0.5, 'b_H': 0.15/24, 'X_max': 8000,
+            
+            # Автотрофы (нитрификация)
+            'Y_A': 0.24, 'mu_max_A': 0.8/24, 'K_NH': 1.0,
+            'K_OA': 0.4, 'b_A': 0.05/24,
+            
+            # Денитрификация
+            'eta_g': 0.8, 'K_NO': 0.5,
+            
+            # Аэрация
+            'kLa': 100/24, 'O_sat': 8.0,
+            
+            # Входные концентрации
+            'S_bio_in': 150.0, 'S_inert_in': 32.5,
+            'X_BH_in': 100.0, 'X_BA_in': 10.0,
+            'S_NH_in': 30.0, 'S_NO_in': 0.5,
+            'O_in': 2.0,
+            
+            # Адаптация
+            'tau_adapt': 36,
+        }
+    
+    def derivatives(t, y, p):
+        S_bio, X_BH, S_inert, X_BA, S_NH, S_NO, O = y
+        
+        # Расходы
+        Q = p['Q']; Q_r = p['r'] * Q; Q_total = Q + Q_r; V = p['V']
+        
+        # Рециркуляция
+        X_BH_r = min(p['X_r_max'], X_BH * 1.5)
+        X_BA_r = min(p['X_r_max'], X_BA * 1.5)
+        S_bio_r = S_bio
+        S_inert_r = S_inert * (1 - p['eta'])
+        S_NH_r = S_NH
+        S_NO_r = S_NO
+        O_r = O
+        
+        # Адаптация
+        adapt = 1 - np.exp(-t / p['tau_adapt'])
+        
+        # Лимит по плотности (для обеих биомасс)
+        density_H = max(0, 1 - X_BH / p['X_max'])
+        density_A = max(0, 1 - X_BA / (p['X_max'] / 2))
+        
+        # Скорость роста гетеротрофов (аэробная)
+        mu_H = (p['mu_max_H'] * 
+                (S_bio / (p['K_S'] + S_bio)) * 
+                (O / (p['K_OH'] + O)) *
+                density_H * adapt)
+        
+        # Скорость роста гетеротрофов (аноксидная, денитрификация)
+        mu_H_anox = (p['mu_max_H'] * p['eta_g'] *
+                     (S_bio / (p['K_S'] + S_bio)) *
+                     (S_NO / (p['K_NO'] + S_NO)) *
+                     (p['K_OH'] / (p['K_OH'] + O)) *
+                     density_H * adapt)
+        
+        # Скорость роста автотрофов (нитрификация)
+        mu_A = (p['mu_max_A'] *
+                (S_NH / (p['K_NH'] + S_NH)) *
+                (O / (p['K_OA'] + O)) *
+                density_A * adapt)
+        
+        # ===== БАЛАНСОВЫЕ УРАВНЕНИЯ =====
+        
+        # Субстрат (биоразлагаемая органика)
+        dS_bio = (Q * p['S_bio_in'] + Q_r * S_bio_r - Q_total * S_bio) / V \
+                 - (mu_H / p['Y_H']) * X_BH - (mu_H_anox / p['Y_H']) * X_BH
+        
+        # Гетеротрофная биомасса
+        dX_BH = (Q * p['X_BH_in'] + Q_r * X_BH_r - Q_total * X_BH) / V \
+                + mu_H * X_BH + mu_H_anox * X_BH - p['b_H'] * X_BH
+        
+        # Инертный субстрат
+        dS_inert = (Q * p['S_inert_in'] + Q_r * S_inert_r - Q_total * S_inert) / V
+        
+        # Автотрофная биомасса (нитрификаторы)
+        dX_BA = (Q * p['X_BA_in'] + Q_r * X_BA_r - Q_total * X_BA) / V \
+                + mu_A * X_BA - p['b_A'] * X_BA
+        
+        # Аммоний (потребляется гетеротрофами и автотрофами)
+        dS_NH = (Q * p['S_NH_in'] + Q_r * S_NH_r - Q_total * S_NH) / V \
+                - 0.086 * (mu_H + mu_H_anox) * X_BH \
+                - (1 / p['Y_A']) * mu_A * X_BA
+        
+        # Нитраты (образуются автотрофами, потребляются гетеротрофами при денитрификации)
+        dS_NO = (Q * p['S_NO_in'] + Q_r * S_NO_r - Q_total * S_NO) / V \
+                + (1 - p['Y_A']) / (2.86 * p['Y_A']) * mu_A * X_BA \
+                - (1 - p['Y_H']) / (2.86 * p['Y_H']) * mu_H_anox * X_BH
+        
+        # Кислород (потребляется гетеротрофами и автотрофами)
+        dO = (Q * p['O_in'] + Q_r * O_r - Q_total * O) / V \
+             + p['kLa'] * (p['O_sat'] - O) \
+             - (1 - p['Y_H']) / p['Y_H'] * (mu_H + mu_H_anox) * X_BH \
+             - (4.57 - p['Y_A']) / p['Y_A'] * mu_A * X_BA
+        
+        return [dS_bio, dX_BH, dS_inert, dX_BA, dS_NH, dS_NO, dO]
+    
+    # Начальные условия
+    y0 = [
+        params['S_bio_in'],
+        params['X_BH_in'],
+        params['S_inert_in'],
+        params['X_BA_in'],
+        params['S_NH_in'],
+        params['S_NO_in'],
+        params['O_in']
+    ]
+    
+    t_span = (0, 30)
+    t_eval = np.linspace(0, 30, 1000)
+    
+    sol = solve_ivp(derivatives, t_span, y0, args=(params,),
+                    t_eval=t_eval, method='BDF', rtol=1e-6)
+    
+    return sol, params
+
+def secondary_clarifier_with_nitri(sol, params):
+    """
+    Отстойник для модели с нитрификацией
+    """
+    S_bio, X_BH, S_inert, X_BA, S_NH, S_NO, O = sol.y
+    
+    Q_daily = params['Q'] * 24
+    MLSS = (X_BH + X_BA) / 1000
+    F_M = (params['S_bio_in'] * Q_daily / params['V']) / MLSS / 1000
+    
+    removal = np.clip(0.25 + 0.1 * F_M, 0.3, 0.4)
+    
+    S_inert_final = S_inert * (1 - removal)
+    X_BH_final = X_BH * 0.01
+    X_BA_final = X_BA * 0.01
+    BOD_final = S_bio + S_inert_final
+    
+    return {
+        't': sol.t,
+        'S_bio': S_bio,
+        'X_BH': X_BH,
+        'S_inert': S_inert,
+        'X_BA': X_BA,
+        'S_NH': S_NH,
+        'S_NO': S_NO,
+        'O': O,
+        'S_inert_final': S_inert_final,
+        'BOD_final': BOD_final,
+        'X_BH_final': X_BH_final,
+        'X_BA_final': X_BA_final,
+        'removal': removal,
+        'F_M': F_M,
+        'X_final': X_BH_final + X_BA_final,
+        'X_BH_final': X_BH_final,
+        'X_BA_final': X_BA_final 
     }
 
