@@ -3,8 +3,28 @@ import asm1_model as am
 import asm1_view as av
 import asm1_analyze as aa
 import os
+from pandas import DataFrame
 
 city_params = ap.get_city_params('vlg')
+
+def save_tertiary_treatment(all_tt, model=""):
+    df_tertiary = DataFrame([
+        {
+            'method': item['method'],
+            'bod_out': item['data']['bod_out'],
+            'ss_out': item['data']['ss_out'],
+            'eff_bod': item['data']['eff_bod'],
+            'eff_ss': item['data']['eff_ss'],
+            'fm_ratio': item['data']['fm_ratio'],
+            'ji': item['data'].get('ji', 'N/A')
+        }
+        for item in all_tt
+    ])
+
+    path_tertiary = os.path.join("results", model, f"tertiary_treatment_{model}.csv")
+    os.makedirs(os.path.dirname(path_tertiary), exist_ok=True)
+    df_tertiary.to_csv(path_tertiary, index=False)
+
 
 def benchmark_model (city_params: dict, ctx = None):
 
@@ -17,6 +37,14 @@ def benchmark_model (city_params: dict, ctx = None):
     clar = None
     df_sens = None
     comp_exp = None
+
+    tertiary_methods=[
+        'sand_filter',
+        'disc_filter',
+        'membrane',
+        'carbon_filter',
+        'coagulation_filtration'
+    ]
 
     param_changes = {
         'Высокая нагрузка (+50%)': {'S_bio_in': city_params['S_bio_in'] * 1.5},
@@ -53,9 +81,25 @@ def benchmark_model (city_params: dict, ctx = None):
             print('no model selected')
             return 0
 
+    all_tt = []
+
+    for method in tertiary_methods:
+        tt = am.tertiary_treatment(params, clar, method)
+        all_tt.append({
+            "method": method,
+            "data": tt
+        })
+
+    allowed_methods = ['membrane']
+    filtered_tt = [item for item in all_tt if item['method'] in allowed_methods]
+
+    ctx['tertiary_treatment'] = filtered_tt
+
     av.plot_results_v2(sol, params, clar, ctx)
 
     aa.analyze_model(sol, params, clar, model_name=model)
+
+    save_tertiary_treatment(all_tt, model)
 
     path = os.path.join("results", model, f"sensitivity_analysis_{model}.csv")
     print(path)

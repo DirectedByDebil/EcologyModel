@@ -332,3 +332,111 @@ def secondary_clarifier_with_nitri(sol, params):
         'X_BA_final': X_BA_final 
     }
 
+
+def tertiary_treatment(params, clar_results, method='sand_filter'):
+    """
+    Доочистка сточных вод после вторичного отстойника
+    
+    Параметры:
+        sol - решение аэротенка
+        params - параметры модели
+        clar_results - результаты отстойника
+        method - метод доочистки: 'sand_filter', 'disc_filter', 'membrane', 'carbon_filter', 'coagulation_filtration'
+    
+    Возвращает:
+        словарь с результатами доочистки
+    """
+    
+    # Извлекаем данные из отстойника
+    bod_in = clar_results['BOD_final'][-1]  # БПК после отстойника, мг/л
+    ss_in = clar_results['X_final'][-1]     # вынос ила (взвешенные вещества), мг/л
+    fm_ratio = clar_results['F_M'][-1]      # иловая нагрузка F/M, кг/(кг·сут)
+    
+    # Иловый индекс (можно рассчитать приближённо по F/M)
+    # При высоком F/M ил молодой и плохо оседает → индекс выше
+    if 'Ji' in params:
+        ji = params['Ji']
+    else:
+        # Эмпирическая зависимость: Ji = 50 + 100 * (fm_ratio - 0.3)
+        ji = 50 + 100 * max(0, fm_ratio - 0.3)
+        ji = min(ji, 200)  # ограничиваем
+    
+    # =========================================================
+    # Расчёт эффективности в зависимости от метода
+    # =========================================================
+    
+    if method == 'sand_filter':
+        # Песчаный фильтр (медленный)
+        # Эффективность зависит от концентрации взвеси и F/M
+        base_eff_ss = 0.60
+        # Коррекция по F/M: высокий F/M → хуже фильтрация
+        fm_factor = 1.0 - (fm_ratio - 0.3) * 0.3
+        fm_factor = max(0.7, min(1.0, fm_factor))
+        eff_ss = base_eff_ss * fm_factor
+        # БПК снижается пропорционально удалению взвеси
+        eff_bod = eff_ss * 0.7 + 0.10
+        
+    elif method == 'disc_filter':
+        # Дисковый фильтр (высокоскоростной)
+        base_eff_ss = 0.75
+        fm_factor = 1.0 - (fm_ratio - 0.3) * 0.25
+        fm_factor = max(0.75, min(1.0, fm_factor))
+        eff_ss = base_eff_ss * fm_factor
+        eff_bod = eff_ss * 0.8 + 0.05
+        
+    elif method == 'membrane':
+        # Мембранная ультрафильтрация
+        eff_ss = 0.98
+        eff_bod = 0.85
+        fm_factor = 1.0 - (fm_ratio - 0.3) * 0.1
+        eff_ss = eff_ss * max(0.95, min(1.0, fm_factor))
+        eff_bod = eff_bod * max(0.95, min(1.0, fm_factor))
+        
+    elif method == 'carbon_filter':
+        # Фильтр с активированным углём (сорбция)
+        base_eff_bod = 0.80
+        fm_factor = 1.0 - (fm_ratio - 0.3) * 0.4
+        fm_factor = max(0.60, min(1.0, fm_factor))
+        eff_bod = base_eff_bod * fm_factor
+        eff_ss = 0.50
+        
+    elif method == 'coagulation_filtration':
+        # Коагуляция + фильтрация
+        base_eff_ss = 0.90
+        base_eff_bod = 0.70
+        fm_factor = 1.0 - (fm_ratio - 0.3) * 0.2
+        fm_factor = max(0.80, min(1.0, fm_factor))
+        eff_ss = base_eff_ss * fm_factor
+        eff_bod = base_eff_bod * fm_factor
+        
+    elif method == 'none':
+        return {
+            'bod_out': bod_in,
+            'ss_out': ss_in,
+            'eff_bod': 0.0,
+            'eff_ss': 0.0,
+            'method': 'none'
+        }
+    else:
+        raise ValueError(f"Unknown method: {method}")
+    
+    # Ограничиваем эффективность разумными пределами
+    eff_ss = max(0.30, min(0.99, eff_ss))
+    eff_bod = max(0.10, min(0.95, eff_bod))
+    
+    # Финальные концентрации
+    ss_out = ss_in * (1 - eff_ss)
+    bod_out = bod_in * (1 - eff_bod)
+    
+    return {
+        'bod_in': bod_in,
+        'bod_out': bod_out,
+        'ss_in': ss_in,
+        'ss_out': ss_out,
+        'eff_bod': eff_bod * 100,
+        'eff_ss': eff_ss * 100,
+        'fm_ratio': fm_ratio,
+        'ji': ji,
+        'method': method
+    }
+
